@@ -9,16 +9,17 @@
     <a asp-action="Create" class="btn btn-primary">Yeni Zimmet</a>
 </div>
 
-<!-- Sekme başlıkları: Bootstrap tab bileşeni (sayfa yenilenmeden sekme değişir) -->
+<!-- Sekme başlıkları: Bootstrap tab bileşeni (sayfa yenilenmeden sekme değişir).
+     Sayılar AJAX iade sonrası JS tarafından güncellenir (id'ler bu yüzden var). -->
 <ul class="nav nav-tabs" role="tablist">
     <li class="nav-item" role="presentation">
         <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#aktif-zimmetler" type="button" role="tab">
-            Aktif Zimmetler <span class="badge text-bg-primary">@Model.ActiveAssignments.Count</span>
+            Aktif Zimmetler <span id="activeCount" class="badge text-bg-primary">@Model.ActiveAssignments.Count</span>
         </button>
     </li>
     <li class="nav-item" role="presentation">
         <button class="nav-link" data-bs-toggle="tab" data-bs-target="#zimmet-gecmisi" type="button" role="tab">
-            Zimmet Geçmişi <span class="badge text-bg-secondary">@Model.HistoryAssignments.Count</span>
+            Zimmet Geçmişi <span id="historyCount" class="badge text-bg-secondary">@Model.HistoryAssignments.Count</span>
         </button>
     </li>
 </ul>
@@ -39,24 +40,30 @@
                             <th class="text-end">İşlem</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="activeTableBody">
                         @if (Model.ActiveAssignments.Count == 0)
                         {
-                            <tr>
+                            <tr class="empty-row">
                                 <td colspan="6" class="text-center text-muted py-4">Aktif zimmet bulunmuyor.</td>
                             </tr>
                         }
 
                         @foreach (var assignment in Model.ActiveAssignments)
                         {
-                            <tr>
+                            <tr class="active-row" data-assignment-id="@assignment.AssignmentId">
                                 <td class="fw-semibold">@assignment.Asset.AssetName</td>
                                 <td><code>@assignment.Asset.SerialNo</code></td>
                                 <td>@assignment.User.FullName</td>
                                 <td>@assignment.AssignedAt.ToString("dd.MM.yyyy HH:mm")</td>
                                 <td>@assignment.AssignmentNote</td>
                                 <td class="text-end">
-                                    <a asp-action="Return" asp-route-id="@assignment.AssignmentId" class="btn btn-sm btn-outline-success">İade Al</a>
+                                    @* JS kapalıysa bu link normal Return sayfasını açar;
+                                       JS açıksa (assignment-index.js) tıklama yakalanır ve modal açılır. *@
+                                    <a asp-action="Return" asp-route-id="@assignment.AssignmentId"
+                                       class="btn btn-sm btn-outline-success js-return-button"
+                                       data-assignment-id="@assignment.AssignmentId"
+                                       data-asset-name="@assignment.Asset.AssetName"
+                                       data-user-name="@assignment.User.FullName">İade Al</a>
                                 </td>
                             </tr>
                         }
@@ -82,17 +89,17 @@
                             <th>İade Notu</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="historyTableBody">
                         @if (Model.HistoryAssignments.Count == 0)
                         {
-                            <tr>
+                            <tr class="empty-row">
                                 <td colspan="7" class="text-center text-muted py-4">Zimmet geçmişi bulunmuyor.</td>
                             </tr>
                         }
 
                         @foreach (var assignment in Model.HistoryAssignments)
                         {
-                            <tr>
+                            <tr class="history-row">
                                 <td class="fw-semibold">@assignment.Asset.AssetName</td>
                                 <td><code>@assignment.Asset.SerialNo</code></td>
                                 <td>@assignment.User.FullName</td>
@@ -108,3 +115,50 @@
         </div>
     </div>
 </div>
+
+<!-- İade modal penceresi: "İade Al" butonuyla açılır, iade notu alınır.
+     Form tag helper anti-forgery token'ı gizli alan olarak ekler; JS formu serialize ederek token'ı da gönderir. -->
+<div class="modal fade" id="returnModal" tabindex="-1" aria-labelledby="returnModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="returnForm" asp-action="ReturnAjax" method="post">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="returnModalLabel">Zimmet İade</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        <strong id="returnAssetName"></strong> varlığı
+                        <strong id="returnUserName"></strong> kullanıcısından iade alınacak.
+                    </p>
+
+                    <!-- Hangi zimmetin iade edileceği (JS tarafından doldurulur) -->
+                    <input type="hidden" id="returnAssignmentId" name="id" />
+
+                    <label for="returnNote" class="form-label">İade Notu</label>
+                    <textarea id="returnNote" name="returnNote" class="form-control" rows="3" maxlength="250"
+                              placeholder="Örn. Sorunsuz teslim alındı"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Vazgeç</button>
+                    <button type="submit" id="returnSubmit" class="btn btn-success">İadeyi Onayla</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Sonuç bildirimi (Bootstrap toast): AJAX iade sonrası başarı / hata mesajı sağ altta görünür -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="resultToast" class="toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div id="resultToastBody" class="toast-body"></div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Kapat"></button>
+        </div>
+    </div>
+</div>
+
+<!-- Sayfaya özel JS: modal ile AJAX iade, satırı geçmişe taşıma, toast bildirimi -->
+@section Scripts {
+    <script src="~/js/assignment-index.js" asp-append-version="true"></script>
+}

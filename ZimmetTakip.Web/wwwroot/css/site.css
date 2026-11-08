@@ -25,3 +25,7 @@ html {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+/* Varlık listesinde satıra tıklanabildiğini göstermek için el imleci (detay satırı açılır) */
+.asset-row {
+  cursor: pointer;
+}

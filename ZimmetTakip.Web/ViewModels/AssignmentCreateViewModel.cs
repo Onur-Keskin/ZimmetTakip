@@ -12,6 +12,11 @@ public class AssignmentCreateViewModel
     [Display(Name = "Kullanıcı")]
     public int? UserId { get; set; }
 
+    // Kategori: varlık listesini daraltmak için kullanılır (seçilince varlıklar AJAX ile yüklenir).
+    // Veritabanına kaydedilmez; zorunlu değildir.
+    [Display(Name = "Kategori")]
+    public int? CategoryId { get; set; }
+
     // Zimmetlenecek varlık
     [Required(ErrorMessage = "Varlık seçiniz.")]
     [Display(Name = "Varlık")]
@@ -25,6 +30,9 @@ public class AssignmentCreateViewModel
     // Açılır liste seçenekleri: sadece ekranda gösterim içindir, formdan gelmez ve doğrulanmaz
     [ValidateNever]
     public List<SelectListItem> UserOptions { get; set; } = new List<SelectListItem>();
+
+    [ValidateNever]
+    public List<SelectListItem> CategoryOptions { get; set; } = new List<SelectListItem>();
 
     [ValidateNever]
     public List<SelectListItem> AssetOptions { get; set; } = new List<SelectListItem>();

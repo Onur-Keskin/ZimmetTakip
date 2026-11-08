@@ -33,6 +33,50 @@ public class AssetController : Controller
         return View(assets);
     }
 
+    // GET /Asset/Search?term=dell
+    // Canlı arama için JSON döner (Asset/Index sayfasındaki jQuery $.ajax isteği çağırır).
+    // Varlık adı, marka veya seri numarasında aranan metni içeren varlıkları getirir; boş aramada hepsini.
+    [HttpGet]
+    public async Task<IActionResult> Search(string? term)
+    {
+        var query = _context.Assets
+            .Include(a => a.Category)
+            .AsQueryable();
+
+        // Arama metni girildiyse filtrele (SQL tarafında LIKE '%metin%' olarak çalışır)
+        if (!string.IsNullOrWhiteSpace(term))
+        {
+            string searchText = term.Trim();
+            query = query.Where(a =>
+                a.AssetName.Contains(searchText) ||
+                (a.Brand != null && a.Brand.Contains(searchText)) ||
+                a.SerialNo.Contains(searchText));
+        }
+
+        var assets = await query
+            .OrderBy(a => a.AssetName)
+            .ToListAsync();
+
+        // Tabloyu çizmek için gereken alanları JSON'a uygun basit nesnelere dönüştür.
+        // Durum metni ve rozet rengi StatusHelper'dan alınır; böylece sunucuda çizilen tabloyla aynı görünür.
+        var result = assets.Select(a => new
+        {
+            assetId = a.AssetId,
+            assetName = a.AssetName,
+            categoryName = a.Category.CategoryName,
+            brand = a.Brand,
+            model = a.Model,
+            serialNo = a.SerialNo,
+            status = a.Status,
+            statusText = StatusHelper.GetDisplayName(a.Status),
+            statusBadgeClass = StatusHelper.GetBadgeClass(a.Status),
+            purchaseDate = a.PurchaseDate?.ToString("dd.MM.yyyy"),
+            description = a.Description
+        });
+
+        return Json(result);
+    }
+
     // GET /Asset/Create
     // Boş varlık ekleme formunu gösterir (varsayılan durum: Depoda).
     [HttpGet]

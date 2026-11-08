@@ -94,6 +94,11 @@ public class AssignmentController : Controller
             ModelState.AddModelError(nameof(model.AssetId),
                 $"Sadece \"Depoda\" durumundaki varlıklar zimmetlenebilir. Bu varlığın durumu: {StatusHelper.GetDisplayName(asset.Status)}.");
         }
+        else if (model.CategoryId != null && asset.CategoryId != model.CategoryId)
+        {
+            // Kategori seçildiyse varlık o kategoriye ait olmalı (form dışından gelen isteklere karşı)
+            ModelState.AddModelError(nameof(model.AssetId), "Seçilen varlık, seçilen kategoriye ait değil.");
+        }
 
         // İş kuralı: bir varlığın aynı anda tek aktif zimmeti olabilir
         bool hasActiveAssignment = await _context.Assignments
@@ -213,12 +218,8 @@ public class AssignmentController : Controller
             return View(model);
         }
 
-        // Zimmeti kapat: iade tarihi ve notu
-        assignment.ReturnedAt = DateTime.Now;
-        assignment.ReturnNote = model.ReturnNote?.Trim();
-
-        // Varlığı tekrar "Depoda" durumuna al
-        assignment.Asset.Status = StatusHelper.InStock;
+        // Zimmeti kapat ve varlığı tekrar "Depoda" yap (ortak metot)
+        MarkAsReturned(assignment, model.ReturnNote);
 
         // Önce değişiklikleri veritabanına gönder, sonra transaction'ı onayla
         await _context.SaveChangesAsync();
@@ -228,10 +229,103 @@ public class AssignmentController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    // Formdaki kullanıcı ve varlık açılır listelerini doldurur.
+    // POST /Assignment/ReturnAjax
+    // Zimmetler sayfasındaki modal penceresinden jQuery $.ajax ile çağrılır.
+    // Return (POST) ile aynı işi yapar ama sayfaya yönlendirmek yerine JSON döner.
+    // Anti-forgery token, modal içindeki formla birlikte gönderilir.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ReturnAjax(int id, string? returnNote)
+    {
+        // İade notu uzunluk kontrolü (assignments.return_note en fazla 250 karakter)
+        if (returnNote != null && returnNote.Trim().Length > 250)
+        {
+            return Json(new { success = false, message = "İade notu en fazla 250 karakter olabilir." });
+        }
+
+        // Transaction başlat: zimmet güncelleme ve varlık güncelleme tek bir bütün olarak yapılır
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+
+        var assignment = await _context.Assignments
+            .Include(a => a.Asset)
+            .Include(a => a.User)
+            .FirstOrDefaultAsync(a => a.AssignmentId == id);
+        if (assignment == null)
+        {
+            return Json(new { success = false, message = "Zimmet kaydı bulunamadı." });
+        }
+
+        // Zaten iade edilmiş zimmet tekrar iade edilemez
+        if (assignment.ReturnedAt != null)
+        {
+            return Json(new { success = false, message = "Bu zimmet zaten iade edilmiş." });
+        }
+
+        // Zimmeti kapat ve varlığı tekrar "Depoda" yap (ortak metot)
+        MarkAsReturned(assignment, returnNote);
+
+        await _context.SaveChangesAsync();
+        await transaction.CommitAsync();
+
+        // JS'nin satırı "Zimmet Geçmişi" sekmesine ekleyebilmesi için gereken bilgileri döndür
+        return Json(new
+        {
+            success = true,
+            message = $"İade alındı: \"{assignment.Asset.AssetName}\" ({assignment.User.FullName})",
+            assignmentId = assignment.AssignmentId,
+            assetName = assignment.Asset.AssetName,
+            serialNo = assignment.Asset.SerialNo,
+            userFullName = assignment.User.FullName,
+            assignedAt = assignment.AssignedAt.ToString("dd.MM.yyyy HH:mm"),
+            returnedAt = assignment.ReturnedAt!.Value.ToString("dd.MM.yyyy HH:mm"),
+            assignmentNote = assignment.AssignmentNote,
+            returnNote = assignment.ReturnNote
+        });
+    }
+
+    // İade işleminin ortak kısmı (hem normal formdan hem AJAX'tan kullanılır):
+    // zimmet kapatılır (iade tarihi + notu) ve varlık tekrar "Depoda" durumuna alınır.
+    // Kaydetme (SaveChanges) ve transaction çağıran metotta yapılır.
+    private static void MarkAsReturned(Assignment assignment, string? returnNote)
+    {
+        assignment.ReturnedAt = DateTime.Now;
+        assignment.ReturnNote = returnNote?.Trim();
+        assignment.Asset.Status = StatusHelper.InStock;
+    }
+
+    // GET /Assignment/AssetsByCategory?categoryId=3
+    // Cascade dropdown için JSON döner (Assignment/Create sayfasındaki jQuery $.ajax isteği çağırır).
+    // Seçilen kategorideki yalnızca "Depoda" (in_stock) varlıkları listeler.
+    [HttpGet]
+    public async Task<IActionResult> AssetsByCategory(int categoryId)
+    {
+        var assets = await _context.Assets
+            .Where(a => a.CategoryId == categoryId && a.Status == StatusHelper.InStock)
+            .OrderBy(a => a.AssetName)
+            .Select(a => new
+            {
+                value = a.AssetId,
+                text = a.AssetName + " - " + a.SerialNo
+            })
+            .ToListAsync();
+
+        return Json(assets);
+    }
+
+    // Formdaki kullanıcı, kategori ve varlık açılır listelerini doldurur.
     // Sadece aktif kullanıcılar ve "Depoda" durumundaki varlıklar listelenir.
+    // (JS açıkken varlık listesi kategoriye göre AJAX ile yeniden doldurulur; JS kapalıyken bu tam liste kullanılır.)
     private async Task FillOptionsAsync(AssignmentCreateViewModel model)
     {
+        model.CategoryOptions = await _context.Categories
+            .OrderBy(c => c.CategoryName)
+            .Select(c => new SelectListItem
+            {
+                Value = c.CategoryId.ToString(),
+                Text = c.CategoryName
+            })
+            .ToListAsync();
+
         model.UserOptions = await _context.Users
             .Where(u => u.IsActive)
             .OrderBy(u => u.FullName)

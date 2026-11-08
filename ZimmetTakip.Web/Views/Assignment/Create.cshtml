@@ -26,10 +26,21 @@
                 <span asp-validation-for="UserId" class="text-danger small"></span>
             </div>
 
-            <!-- Varlık seçimi (sadece Depoda olanlar) -->
+            <!-- Kategori seçimi: seçilince o kategorideki depodaki varlıklar AJAX ile yüklenir -->
+            <div class="mb-3">
+                <label asp-for="CategoryId" class="form-label"></label>
+                <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select">
+                    <option value="">-- Kategori seçiniz --</option>
+                </select>
+                <span asp-validation-for="CategoryId" class="text-danger small"></span>
+            </div>
+
+            <!-- Varlık seçimi (sadece Depoda olanlar).
+                 data-url: kategoriye göre varlıkları getiren JSON adresi (assignment-create.js kullanır) -->
             <div class="mb-3">
                 <label asp-for="AssetId" class="form-label"></label>
-                <select asp-for="AssetId" asp-items="Model.AssetOptions" class="form-select">
+                <select asp-for="AssetId" asp-items="Model.AssetOptions" class="form-select"
+                        data-url="@Url.Action("AssetsByCategory")">
                     <option value="">-- Varlık seçiniz --</option>
                 </select>
                 <span asp-validation-for="AssetId" class="text-danger small"></span>
@@ -48,7 +59,8 @@
     </div>
 </div>
 
-<!-- İstemci tarafı doğrulama script'leri -->
+<!-- İstemci tarafı doğrulama script'leri + kategori → varlık cascade dropdown -->
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script src="~/js/assignment-create.js" asp-append-version="true"></script>
 }
