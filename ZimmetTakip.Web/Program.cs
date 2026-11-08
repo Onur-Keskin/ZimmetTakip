@@ -1,29 +1,38 @@
+using Microsoft.EntityFrameworkCore;
+using ZimmetTakip.Web.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// MVC servislerini ekle (Controller + View)
 builder.Services.AddControllersWithViews();
+
+// Veritabanı bağlantısı: scaffold edilen ZimmetDbContext'i SQL Server ile kaydet.
+// Bağlantı cümlesi appsettings.json içindeki "ZimmetDb" anahtarından okunur.
+builder.Services.AddDbContext<ZimmetDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("ZimmetDb")));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Geliştirme ortamı dışında hataları genel hata sayfasına yönlendir
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
+// İstek işleme sırası: HTTPS yönlendirme → yönlendirme (routing) → yetkilendirme
 app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthorization();
 
+// wwwroot altındaki statik dosyalar (css, js, lib)
 app.MapStaticAssets();
 
+// Varsayılan rota: /Controller/Action/id (varsayılan Home/Index)
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
-
 
 app.Run();

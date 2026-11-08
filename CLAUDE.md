@@ -30,4 +30,5 @@ BT envanter ve zimmet takip sistemi. BLM5227 dönem projesi.
 - Kullanıcıya görünen tüm metinler (menü, başlık, buton, mesaj, doğrulama hataları) **Türkçe**.
 
 ## Çalışma şekli
+- Şema, iş kuralları ve faz kapsamı için proje kökündeki `proje-plan.md` esas alınır.
 - Her fazda **SADECE istenen işi yap**. Kapsamı genişletme; istenmeyen sayfa, özellik, paket veya refactor ekleme.
