@@ -31,4 +31,5 @@ BT envanter ve zimmet takip sistemi. BLM5227 dönem projesi.
 
 ## Çalışma şekli
 - Şema, iş kuralları ve faz kapsamı için proje kökündeki `proje-plan.md` esas alınır.
+- Git commit ve push işlemlerini ASLA yapma; commit'leri kullanıcı kendisi atar. İş bitince sadece değişen dosyaların listesini ver.
 - Her fazda **SADECE istenen işi yap**. Kapsamı genişletme; istenmeyen sayfa, özellik, paket veya refactor ekleme.

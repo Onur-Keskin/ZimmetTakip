@@ -24,12 +24,53 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <!-- Menü bağlantıları: yeni sayfalar eklendikçe buraya eklenecek -->
                 <div class="collapse navbar-collapse" id="anaMenu">
+                    <!-- Sol menü: yalnızca giriş yapmış kullanıcılara gösterilir -->
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
-                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
+                            </li>
+
+                            <!-- Yönetim menüsü: sadece Admin rolündeki kullanıcılar görür (öğeler sonraki fazda eklenecek) -->
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Yönetim
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <li><span class="dropdown-item-text text-muted small">Henüz öğe yok</span></li>
+                                    </ul>
+                                </li>
+                            }
+                        }
+                    </ul>
+
+                    <!-- Sağ menü: giriş yapmışsa kullanıcı adı + Çıkış, yapmamışsa Giriş / Kayıt bağlantıları -->
+                    <ul class="navbar-nav align-items-md-center">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item">
+                                <span class="navbar-text me-md-3">@User.Identity.Name</span>
+                            </li>
+                            <li class="nav-item">
+                                <!-- Çıkış POST ile yapılır; form tag helper anti-forgery token'ı ekler -->
+                                <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-light btn-sm">Çıkış</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">Giriş Yap</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">Kayıt Ol</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>

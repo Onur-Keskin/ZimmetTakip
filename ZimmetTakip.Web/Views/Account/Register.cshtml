@@ -1,0 +1,67 @@
+@model RegisterViewModel
+@{
+    ViewData["Title"] = "Kayıt Ol";
+}
+
+<!-- Formu sayfanın ortasında kart içinde göster -->
+<div class="row justify-content-center">
+    <div class="col-12 col-sm-10 col-md-7 col-lg-5">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-4 text-center">Kayıt Ol</h1>
+
+                <!-- Kayıt formu: form tag helper anti-forgery token'ı otomatik ekler -->
+                <form asp-action="Register" method="post" novalidate>
+                    <!-- Belirli bir alana ait olmayan genel hatalar -->
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <!-- Ad Soyad -->
+                    <div class="mb-3">
+                        <label asp-for="FullName" class="form-label"></label>
+                        <input asp-for="FullName" class="form-control" autocomplete="name" autofocus />
+                        <span asp-validation-for="FullName" class="text-danger small"></span>
+                    </div>
+
+                    <!-- E-posta (aynı e-posta ile ikinci kayıt engellenir) -->
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" autocomplete="username" />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Departman (isteğe bağlı) -->
+                    <div class="mb-3">
+                        <label asp-for="Department" class="form-label"></label>
+                        <input asp-for="Department" class="form-control" placeholder="İsteğe bağlı" />
+                        <span asp-validation-for="Department" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Parola ve parola tekrarı -->
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ConfirmPassword" class="form-label"></label>
+                        <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+                        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Kayıt Ol</button>
+                </form>
+
+                <!-- Zaten hesabı olanlar için giriş bağlantısı -->
+                <p class="text-center mt-3 mb-0 small">
+                    Zaten hesabınız var mı? <a asp-action="Login">Giriş yapın</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- İstemci tarafı doğrulama: jQuery Validate + Unobtrusive script'leri -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

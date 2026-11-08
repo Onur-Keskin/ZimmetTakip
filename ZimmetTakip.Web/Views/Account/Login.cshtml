@@ -1,0 +1,54 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Giriş Yap";
+}
+
+<!-- Formu sayfanın ortasında dar bir kart içinde göster -->
+<div class="row justify-content-center">
+    <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <h1 class="h4 mb-4 text-center">Giriş Yap</h1>
+
+                <!-- Kayıt sonrası gelen başarı mesajı (TempData ile bir kez gösterilir) -->
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+                }
+
+                <!-- Giriş formu: returnUrl girişten sonra dönülecek sayfayı taşır.
+                     Form tag helper anti-forgery token'ı otomatik ekler. -->
+                <form asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post" novalidate>
+                    <!-- Belirli bir alana ait olmayan hatalar (örn. "E-posta veya parola hatalı.") -->
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <!-- E-posta alanı -->
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label"></label>
+                        <input asp-for="Email" class="form-control" autocomplete="username" autofocus />
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <!-- Parola alanı -->
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label"></label>
+                        <input asp-for="Password" class="form-control" autocomplete="current-password" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Giriş Yap</button>
+                </form>
+
+                <!-- Hesabı olmayanlar için kayıt bağlantısı -->
+                <p class="text-center mt-3 mb-0 small">
+                    Hesabınız yok mu? <a asp-action="Register">Kayıt olun</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- İstemci tarafı doğrulama: jQuery Validate + Unobtrusive script'leri -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
