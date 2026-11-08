@@ -88,6 +88,11 @@ admin controller'ları `[Authorize(Roles="Admin")]`. Yetkisiz erişim → Access
 | assignment_note | NVARCHAR(250)     | NULL                                |
 | return_note     | NVARCHAR(250)     | NULL                                |
 
+> Not: `ux_assignments_active_asset` filtreli unique index'i yalnızca veritabanında tanımlıdır.
+> EF Core scaffold bu index'i görünce assets-assignments ilişkisini yanlışlıkla bire bir (`WithOne`) üretir.
+> Bu yüzden scaffold `--force` ile yenilenirse `Models/Asset.cs` ve `Models/ZimmetDbContext.cs`'teki
+> bu değişiklik geri alınmalıdır (`Asset.Assignments` koleksiyon olarak kalmalı).
+
 > Not: EF Core scaffold snake_case adları C# tarafında otomatik PascalCase'e çevirir
 > (`full_name` → `FullName`, `assignments` → `Assignment`), yani kod tarafı temiz kalır.
 

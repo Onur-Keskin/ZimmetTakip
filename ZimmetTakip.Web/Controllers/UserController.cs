@@ -60,7 +60,7 @@ public class UserController : Controller
 
     // POST /User/Edit/5
     // Kullanıcının rolünü ve aktiflik durumunu günceller.
-    // Admin kendi hesabını pasife alamaz.
+    // Admin kendi hesabını pasife alamaz ve kendi rolünü değiştiremez.
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(int id, UserEditViewModel model)
@@ -90,6 +90,12 @@ public class UserController : Controller
         if (model.IsCurrentUser && !model.IsActive)
         {
             ModelState.AddModelError(nameof(model.IsActive), "Kendi hesabınızı pasife alamazsınız.");
+        }
+
+        // Admin kendi rolünü değiştirirse yönetim yetkisini kaybedebilir; bunu da engelle
+        if (model.IsCurrentUser && model.RoleId != user.RoleId)
+        {
+            ModelState.AddModelError(nameof(model.RoleId), "Kendi hesabınızın rolünü değiştiremezsiniz.");
         }
 
         // Seçilen rol veritabanında gerçekten var mı?

@@ -1,0 +1,54 @@
+@model AssignmentCreateViewModel
+@{
+    ViewData["Title"] = "Yeni Zimmet";
+}
+
+<h1 class="h3 mb-3">Yeni Zimmet</h1>
+
+<div class="card shadow-sm col-lg-6">
+    <div class="card-body">
+        <!-- Depoda zimmetlenebilecek varlık yoksa bilgi ver -->
+        @if (Model.AssetOptions.Count == 0)
+        {
+            <div class="alert alert-info">Şu anda "Depoda" durumunda zimmetlenebilecek varlık bulunmuyor.</div>
+        }
+
+        <!-- Zimmet formu: form tag helper anti-forgery token'ı otomatik ekler -->
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <!-- Kullanıcı seçimi (sadece aktif kullanıcılar) -->
+            <div class="mb-3">
+                <label asp-for="UserId" class="form-label"></label>
+                <select asp-for="UserId" asp-items="Model.UserOptions" class="form-select">
+                    <option value="">-- Kullanıcı seçiniz --</option>
+                </select>
+                <span asp-validation-for="UserId" class="text-danger small"></span>
+            </div>
+
+            <!-- Varlık seçimi (sadece Depoda olanlar) -->
+            <div class="mb-3">
+                <label asp-for="AssetId" class="form-label"></label>
+                <select asp-for="AssetId" asp-items="Model.AssetOptions" class="form-select">
+                    <option value="">-- Varlık seçiniz --</option>
+                </select>
+                <span asp-validation-for="AssetId" class="text-danger small"></span>
+            </div>
+
+            <!-- Zimmet notu (isteğe bağlı) -->
+            <div class="mb-3">
+                <label asp-for="AssignmentNote" class="form-label"></label>
+                <textarea asp-for="AssignmentNote" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="AssignmentNote" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Zimmetle</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Vazgeç</a>
+        </form>
+    </div>
+</div>
+
+<!-- İstemci tarafı doğrulama script'leri -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

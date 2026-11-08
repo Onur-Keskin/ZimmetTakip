@@ -14,6 +14,7 @@ BT envanter ve zimmet takip sistemi. BLM5227 dönem projesi.
 - **EF Core DATABASE-FIRST.** Migration / code-first **ASLA** kullanma (`dotnet ef migrations`, `Database.EnsureCreated` vb. yok).
 - Modeller veritabanından scaffold edilir (`dotnet ef dbcontext scaffold`). Scaffold edilen `Models` klasörünü **elle değiştirme**; ek davranış gerekiyorsa partial class veya ayrı ViewModel kullan.
 - Şema değişikliği gerekirse kodu değiştirmeden önce kullanıcıya **T-SQL script öner**; script kullanıcı tarafından çalıştırıldıktan sonra yeniden scaffold edilir.
+- `ux_assignments_active_asset` filtreli unique index'i yalnızca veritabanında tanımlıdır. EF Core scaffold bu index'i görünce assets-assignments ilişkisini yanlışlıkla bire bir (`WithOne`) üretir. Bu yüzden scaffold `--force` ile yenilenirse `Models/Asset.cs` ve `Models/ZimmetDbContext.cs`'teki bu değişiklik geri alınmalıdır (`Asset.Assignments` koleksiyon olarak kalmalı).
 
 ## Veritabanı adlandırma
 - Tablo ve kolon adları **İngilizce snake_case**: `users`, `assets`, `assignment_note` gibi.

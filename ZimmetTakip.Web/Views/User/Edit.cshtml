@@ -24,12 +24,22 @@
             <input type="hidden" asp-for="UserId" />
             <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
 
-            <!-- Rol açılır listesi -->
+            <!-- Rol açılır listesi: admin kendi hesabını düzenliyorsa kilitli gösterilir -->
             <div class="mb-3">
                 <label asp-for="RoleId" class="form-label"></label>
-                <select asp-for="RoleId" asp-items="Model.RoleOptions" class="form-select">
-                    <option value="">-- Rol seçiniz --</option>
-                </select>
+                @if (Model.IsCurrentUser)
+                {
+                    @* Devre dışı (disabled) alanlar forma gönderilmez; mevcut rol gizli alanla taşınır *@
+                    <input type="hidden" asp-for="RoleId" />
+                    <select asp-for="RoleId" asp-items="Model.RoleOptions" id="RoleIdLocked" class="form-select" disabled></select>
+                    <div class="form-text">Bu sizin hesabınız; kendi rolünüzü değiştiremezsiniz.</div>
+                }
+                else
+                {
+                    <select asp-for="RoleId" asp-items="Model.RoleOptions" class="form-select">
+                        <option value="">-- Rol seçiniz --</option>
+                    </select>
+                }
                 <span asp-validation-for="RoleId" class="text-danger small"></span>
             </div>
 

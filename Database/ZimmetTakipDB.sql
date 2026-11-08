@@ -113,6 +113,20 @@ CREATE TABLE assignments (
 );
 GO
 
+/* ---------------------------------------------------------------------
+   ux_assignments_active_asset - Bir varlığın aynı anda tek aktif zimmeti olabilir
+   - Filtreli (filtered) UNIQUE index: sadece returned_at IS NULL olan satırlara uygulanır
+   - Aynı asset_id için ikinci bir aktif zimmet eklenmek istenirse veritabanı hata verir
+   - İade edilmiş satırlar (returned_at dolu) filtre dışında kalır; böylece bir varlığın
+     zimmet geçmişinde birden fazla kayıt olabilir
+   - Uygulama tarafındaki kontrolü tamamlar: iki kullanıcı aynı anda aynı varlığı
+     zimmetlemeye çalışsa bile ikinci kayıt veritabanı tarafından engellenir
+   --------------------------------------------------------------------- */
+CREATE UNIQUE INDEX ux_assignments_active_asset
+    ON assignments (asset_id)
+    WHERE returned_at IS NULL;
+GO
+
 /* =====================================================================
    SEED - Örnek veriler
    Boş veritabanında IDENTITY değerleri 1'den başladığı için

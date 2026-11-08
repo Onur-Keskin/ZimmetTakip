@@ -1,0 +1,110 @@
+@model AssignmentListViewModel
+@{
+    ViewData["Title"] = "Zimmetler";
+}
+
+<!-- Sayfa başlığı ve yeni zimmet butonu -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Zimmetler</h1>
+    <a asp-action="Create" class="btn btn-primary">Yeni Zimmet</a>
+</div>
+
+<!-- Sekme başlıkları: Bootstrap tab bileşeni (sayfa yenilenmeden sekme değişir) -->
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#aktif-zimmetler" type="button" role="tab">
+            Aktif Zimmetler <span class="badge text-bg-primary">@Model.ActiveAssignments.Count</span>
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#zimmet-gecmisi" type="button" role="tab">
+            Zimmet Geçmişi <span class="badge text-bg-secondary">@Model.HistoryAssignments.Count</span>
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- 1. sekme: aktif zimmetler (returned_at boş) -->
+    <div class="tab-pane fade show active" id="aktif-zimmetler" role="tabpanel">
+        <div class="card shadow-sm border-top-0 rounded-top-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Varlık</th>
+                            <th>Seri No</th>
+                            <th>Kullanıcı</th>
+                            <th>Zimmet Tarihi</th>
+                            <th>Zimmet Notu</th>
+                            <th class="text-end">İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ActiveAssignments.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">Aktif zimmet bulunmuyor.</td>
+                            </tr>
+                        }
+
+                        @foreach (var assignment in Model.ActiveAssignments)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@assignment.Asset.AssetName</td>
+                                <td><code>@assignment.Asset.SerialNo</code></td>
+                                <td>@assignment.User.FullName</td>
+                                <td>@assignment.AssignedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>@assignment.AssignmentNote</td>
+                                <td class="text-end">
+                                    <a asp-action="Return" asp-route-id="@assignment.AssignmentId" class="btn btn-sm btn-outline-success">İade Al</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. sekme: zimmet geçmişi (returned_at dolu) -->
+    <div class="tab-pane fade" id="zimmet-gecmisi" role="tabpanel">
+        <div class="card shadow-sm border-top-0 rounded-top-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Varlık</th>
+                            <th>Seri No</th>
+                            <th>Kullanıcı</th>
+                            <th>Zimmet Tarihi</th>
+                            <th>İade Tarihi</th>
+                            <th>Zimmet Notu</th>
+                            <th>İade Notu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.HistoryAssignments.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">Zimmet geçmişi bulunmuyor.</td>
+                            </tr>
+                        }
+
+                        @foreach (var assignment in Model.HistoryAssignments)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@assignment.Asset.AssetName</td>
+                                <td><code>@assignment.Asset.SerialNo</code></td>
+                                <td>@assignment.User.FullName</td>
+                                <td>@assignment.AssignedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>@assignment.ReturnedAt?.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>@assignment.AssignmentNote</td>
+                                <td>@assignment.ReturnNote</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+@model AssignmentReturnViewModel
+@{
+    ViewData["Title"] = "Zimmet İade";
+}
+
+<h1 class="h3 mb-3">Zimmet İade</h1>
+
+<div class="card shadow-sm col-lg-6">
+    <div class="card-body">
+        <!-- İade edilecek zimmetin bilgileri (sadece gösterim) -->
+        <dl class="row mb-4">
+            <dt class="col-sm-4">Varlık</dt>
+            <dd class="col-sm-8">@Model.AssetName</dd>
+
+            <dt class="col-sm-4">Seri No</dt>
+            <dd class="col-sm-8"><code>@Model.SerialNo</code></dd>
+
+            <dt class="col-sm-4">Kullanıcı</dt>
+            <dd class="col-sm-8">@Model.UserFullName</dd>
+
+            <dt class="col-sm-4">Zimmet Tarihi</dt>
+            <dd class="col-sm-8">@Model.AssignedAt.ToString("dd.MM.yyyy HH:mm")</dd>
+
+            <dt class="col-sm-4">Zimmet Notu</dt>
+            <dd class="col-sm-8">@Model.AssignmentNote</dd>
+        </dl>
+
+        <!-- İade formu: sadece iade notu gönderilir, iade tarihi sunucuda atanır -->
+        <form asp-action="Return" asp-route-id="@Model.AssignmentId" method="post">
+            <input type="hidden" asp-for="AssignmentId" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="ReturnNote" class="form-label"></label>
+                <textarea asp-for="ReturnNote" class="form-control" rows="3" placeholder="Örn. Sorunsuz teslim alındı"></textarea>
+                <span asp-validation-for="ReturnNote" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn btn-success">İadeyi Onayla</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Vazgeç</a>
+        </form>
+    </div>
+</div>
+
+<!-- İstemci tarafı doğrulama script'leri -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

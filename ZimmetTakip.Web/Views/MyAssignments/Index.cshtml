@@ -1,0 +1,100 @@
+@model AssignmentListViewModel
+@{
+    ViewData["Title"] = "Zimmetlerim";
+}
+
+<h1 class="h3 mb-3">Zimmetlerim</h1>
+
+<!-- Sekme başlıkları: Bootstrap tab bileşeni (sayfa yenilenmeden sekme değişir) -->
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#aktif-zimmetlerim" type="button" role="tab">
+            Üzerimdeki Varlıklar <span class="badge text-bg-primary">@Model.ActiveAssignments.Count</span>
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#zimmet-gecmisim" type="button" role="tab">
+            Geçmiş <span class="badge text-bg-secondary">@Model.HistoryAssignments.Count</span>
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- 1. sekme: kullanıcının şu an üzerindeki varlıklar -->
+    <div class="tab-pane fade show active" id="aktif-zimmetlerim" role="tabpanel">
+        <div class="card shadow-sm border-top-0 rounded-top-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Varlık</th>
+                            <th>Kategori</th>
+                            <th>Seri No</th>
+                            <th>Zimmet Tarihi</th>
+                            <th>Zimmet Notu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.ActiveAssignments.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">Üzerinize zimmetli varlık bulunmuyor.</td>
+                            </tr>
+                        }
+
+                        @foreach (var assignment in Model.ActiveAssignments)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@assignment.Asset.AssetName</td>
+                                <td>@assignment.Asset.Category.CategoryName</td>
+                                <td><code>@assignment.Asset.SerialNo</code></td>
+                                <td>@assignment.AssignedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>@assignment.AssignmentNote</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. sekme: kullanıcının daha önce iade ettiği varlıklar -->
+    <div class="tab-pane fade" id="zimmet-gecmisim" role="tabpanel">
+        <div class="card shadow-sm border-top-0 rounded-top-0">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Varlık</th>
+                            <th>Kategori</th>
+                            <th>Seri No</th>
+                            <th>Zimmet Tarihi</th>
+                            <th>İade Tarihi</th>
+                            <th>İade Notu</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.HistoryAssignments.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted py-4">Zimmet geçmişiniz bulunmuyor.</td>
+                            </tr>
+                        }
+
+                        @foreach (var assignment in Model.HistoryAssignments)
+                        {
+                            <tr>
+                                <td class="fw-semibold">@assignment.Asset.AssetName</td>
+                                <td>@assignment.Asset.Category.CategoryName</td>
+                                <td><code>@assignment.Asset.SerialNo</code></td>
+                                <td>@assignment.AssignedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>@assignment.ReturnedAt?.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td>@assignment.ReturnNote</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

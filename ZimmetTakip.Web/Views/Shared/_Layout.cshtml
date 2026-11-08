@@ -33,6 +33,11 @@
                                 <a class="nav-link" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
                             </li>
 
+                            <!-- Zimmetlerim: tüm giriş yapmış kullanıcılar kendi zimmetlerini görür -->
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="MyAssignments" asp-action="Index">Zimmetlerim</a>
+                            </li>
+
                             <!-- Yönetim menüsü: sadece Admin rolündeki kullanıcılar görür -->
                             @if (User.IsInRole("Admin"))
                             {
@@ -44,6 +49,8 @@
                                         <li><a class="dropdown-item" asp-controller="Category" asp-action="Index">Kategoriler</a></li>
                                         <li><a class="dropdown-item" asp-controller="Asset" asp-action="Index">Varlıklar</a></li>
                                         <li><a class="dropdown-item" asp-controller="User" asp-action="Index">Kullanıcılar</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                        <li><a class="dropdown-item" asp-controller="Assignment" asp-action="Index">Zimmetler</a></li>
                                     </ul>
                                 </li>
                             }
