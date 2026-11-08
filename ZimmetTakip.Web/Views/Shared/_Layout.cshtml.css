@@ -1,0 +1,6 @@
+﻿/* Layout'a özel (scoped) stiller */
+
+/* Uzun uygulama adı küçük ekranda taşmasın */
+a.navbar-brand {
+  white-space: normal;
+}
