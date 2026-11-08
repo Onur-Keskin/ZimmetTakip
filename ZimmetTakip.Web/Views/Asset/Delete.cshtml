@@ -1,0 +1,35 @@
+@model Asset
+@{
+    ViewData["Title"] = "Varlık Sil";
+}
+
+<h1 class="h3 mb-3">Varlık Sil</h1>
+
+<!-- Silme onayı: silinecek varlığın bilgileri gösterilir -->
+<div class="card shadow-sm col-lg-6">
+    <div class="card-body">
+        <p>Aşağıdaki varlığı silmek istediğinize emin misiniz?</p>
+
+        <dl class="row mb-4">
+            <dt class="col-sm-4">Varlık Adı</dt>
+            <dd class="col-sm-8">@Model.AssetName</dd>
+
+            <dt class="col-sm-4">Kategori</dt>
+            <dd class="col-sm-8">@Model.Category.CategoryName</dd>
+
+            <dt class="col-sm-4">Seri No</dt>
+            <dd class="col-sm-8"><code>@Model.SerialNo</code></dd>
+
+            <dt class="col-sm-4">Durum</dt>
+            <dd class="col-sm-8">
+                <span class="badge @StatusHelper.GetBadgeClass(Model.Status)">@StatusHelper.GetDisplayName(Model.Status)</span>
+            </dd>
+        </dl>
+
+        <!-- Silme işlemi POST ile yapılır (GET ile veri silinmez) -->
+        <form asp-action="Delete" asp-route-id="@Model.AssetId" method="post">
+            <button type="submit" class="btn btn-danger">Sil</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Vazgeç</a>
+        </form>
+    </div>
+</div>

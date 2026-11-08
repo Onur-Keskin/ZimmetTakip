@@ -1,0 +1,27 @@
+@model CategoryFormViewModel
+@{
+    ViewData["Title"] = "Kategori Düzenle";
+}
+
+<h1 class="h3 mb-3">Kategori Düzenle</h1>
+
+<div class="card shadow-sm col-lg-6">
+    <div class="card-body">
+        <!-- Düzenleme formu: hangi kategorinin güncelleneceği gizli alanda taşınır -->
+        <form asp-action="Edit" asp-route-id="@Model.CategoryId" method="post">
+            <input type="hidden" asp-for="CategoryId" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <!-- Ortak form alanları -->
+            <partial name="_CategoryForm" model="Model" />
+
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Vazgeç</a>
+        </form>
+    </div>
+</div>
+
+<!-- İstemci tarafı doğrulama script'leri -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -33,7 +33,7 @@
                                 <a class="nav-link" asp-controller="Home" asp-action="Index">Ana Sayfa</a>
                             </li>
 
-                            <!-- Yönetim menüsü: sadece Admin rolündeki kullanıcılar görür (öğeler sonraki fazda eklenecek) -->
+                            <!-- Yönetim menüsü: sadece Admin rolündeki kullanıcılar görür -->
                             @if (User.IsInRole("Admin"))
                             {
                                 <li class="nav-item dropdown">
@@ -41,7 +41,9 @@
                                         Yönetim
                                     </a>
                                     <ul class="dropdown-menu">
-                                        <li><span class="dropdown-item-text text-muted small">Henüz öğe yok</span></li>
+                                        <li><a class="dropdown-item" asp-controller="Category" asp-action="Index">Kategoriler</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Asset" asp-action="Index">Varlıklar</a></li>
+                                        <li><a class="dropdown-item" asp-controller="User" asp-action="Index">Kullanıcılar</a></li>
                                     </ul>
                                 </li>
                             }
@@ -80,6 +82,9 @@
     <!-- İçerik alanı: her sayfanın kendi içeriği RenderBody ile buraya yerleşir -->
     <div class="container-fluid py-4">
         <main role="main">
+            <!-- TempData ile gelen başarı / hata mesajları -->
+            <partial name="_Alerts" />
+
             @RenderBody()
         </main>
     </div>

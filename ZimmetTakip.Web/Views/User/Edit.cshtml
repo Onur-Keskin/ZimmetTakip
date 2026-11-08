@@ -1,0 +1,56 @@
+@model UserEditViewModel
+@{
+    ViewData["Title"] = "Kullanıcı Düzenle";
+}
+
+<h1 class="h3 mb-3">Kullanıcı Düzenle</h1>
+
+<div class="card shadow-sm col-lg-6">
+    <div class="card-body">
+        <!-- Kullanıcı bilgileri: sadece gösterim, bu formdan değiştirilemez -->
+        <dl class="row mb-4">
+            <dt class="col-sm-4">Ad Soyad</dt>
+            <dd class="col-sm-8">@Model.FullName</dd>
+
+            <dt class="col-sm-4">E-posta</dt>
+            <dd class="col-sm-8">@Model.Email</dd>
+
+            <dt class="col-sm-4">Departman</dt>
+            <dd class="col-sm-8">@Model.Department</dd>
+        </dl>
+
+        <!-- Düzenleme formu: sadece rol ve aktiflik durumu gönderilir -->
+        <form asp-action="Edit" asp-route-id="@Model.UserId" method="post">
+            <input type="hidden" asp-for="UserId" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+            <!-- Rol açılır listesi -->
+            <div class="mb-3">
+                <label asp-for="RoleId" class="form-label"></label>
+                <select asp-for="RoleId" asp-items="Model.RoleOptions" class="form-select">
+                    <option value="">-- Rol seçiniz --</option>
+                </select>
+                <span asp-validation-for="RoleId" class="text-danger small"></span>
+            </div>
+
+            <!-- Aktiflik anahtarı: kapalıysa kullanıcı giriş yapamaz -->
+            <div class="mb-3 form-check form-switch">
+                <input asp-for="IsActive" class="form-check-input" role="switch" />
+                <label asp-for="IsActive" class="form-check-label"></label>
+                @if (Model.IsCurrentUser)
+                {
+                    <div class="form-text">Bu sizin hesabınız; kendi hesabınızı pasife alamazsınız.</div>
+                }
+                <span asp-validation-for="IsActive" class="text-danger small d-block"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Kaydet</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Vazgeç</a>
+        </form>
+    </div>
+</div>
+
+<!-- İstemci tarafı doğrulama script'leri -->
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

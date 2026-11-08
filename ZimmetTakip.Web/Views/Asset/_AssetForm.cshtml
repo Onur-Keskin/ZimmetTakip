@@ -1,0 +1,71 @@
+@model AssetFormViewModel
+
+@* Varlık formunun alanları: Create ve Edit sayfaları bu parçayı ortak kullanır *@
+
+<div class="row g-3 mb-3">
+    <!-- Kategori açılır listesi -->
+    <div class="col-md-6">
+        <label asp-for="CategoryId" class="form-label"></label>
+        <select asp-for="CategoryId" asp-items="Model.CategoryOptions" class="form-select">
+            <option value="">-- Kategori seçiniz --</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger small"></span>
+    </div>
+
+    <!-- Durum: zimmetli varlıkta değiştirilemez, sadece bilgi olarak gösterilir -->
+    <div class="col-md-6">
+        <label asp-for="Status" class="form-label"></label>
+        @if (Model.IsAssigned)
+        {
+            <input type="hidden" asp-for="Status" />
+            <input type="text" class="form-control" value="@StatusHelper.GetDisplayName(Model.Status)" disabled />
+            <div class="form-text">Zimmetli varlığın durumu iade işlemiyle değişir.</div>
+        }
+        else
+        {
+            <select asp-for="Status" asp-items="Model.StatusOptions" class="form-select"></select>
+            <span asp-validation-for="Status" class="text-danger small"></span>
+        }
+    </div>
+
+    <!-- Varlık adı -->
+    <div class="col-md-6">
+        <label asp-for="AssetName" class="form-label"></label>
+        <input asp-for="AssetName" class="form-control" />
+        <span asp-validation-for="AssetName" class="text-danger small"></span>
+    </div>
+
+    <!-- Seri numarası (benzersiz) -->
+    <div class="col-md-6">
+        <label asp-for="SerialNo" class="form-label"></label>
+        <input asp-for="SerialNo" class="form-control" />
+        <span asp-validation-for="SerialNo" class="text-danger small"></span>
+    </div>
+
+    <!-- Marka ve model -->
+    <div class="col-md-6">
+        <label asp-for="Brand" class="form-label"></label>
+        <input asp-for="Brand" class="form-control" />
+        <span asp-validation-for="Brand" class="text-danger small"></span>
+    </div>
+
+    <div class="col-md-6">
+        <label asp-for="ModelName" class="form-label"></label>
+        <input asp-for="ModelName" class="form-control" />
+        <span asp-validation-for="ModelName" class="text-danger small"></span>
+    </div>
+
+    <!-- Alım tarihi (tarih seçici) -->
+    <div class="col-md-6">
+        <label asp-for="PurchaseDate" class="form-label"></label>
+        <input asp-for="PurchaseDate" class="form-control" />
+        <span asp-validation-for="PurchaseDate" class="text-danger small"></span>
+    </div>
+
+    <!-- Açıklama (isteğe bağlı) -->
+    <div class="col-12">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="2"></textarea>
+        <span asp-validation-for="Description" class="text-danger small"></span>
+    </div>
+</div>

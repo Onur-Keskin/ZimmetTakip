@@ -1,0 +1,27 @@
+@model Category
+@{
+    ViewData["Title"] = "Kategori Sil";
+}
+
+<h1 class="h3 mb-3">Kategori Sil</h1>
+
+<!-- Silme onayı: silinecek kategorinin bilgileri gösterilir -->
+<div class="card shadow-sm col-lg-6">
+    <div class="card-body">
+        <p>Aşağıdaki kategoriyi silmek istediğinize emin misiniz?</p>
+
+        <dl class="row mb-4">
+            <dt class="col-sm-4">Kategori Adı</dt>
+            <dd class="col-sm-8">@Model.CategoryName</dd>
+
+            <dt class="col-sm-4">Açıklama</dt>
+            <dd class="col-sm-8">@Model.Description</dd>
+        </dl>
+
+        <!-- Silme işlemi POST ile yapılır (GET ile veri silinmez) -->
+        <form asp-action="Delete" asp-route-id="@Model.CategoryId" method="post">
+            <button type="submit" class="btn btn-danger">Sil</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Vazgeç</a>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,57 @@
+@model List<Asset>
+@{
+    ViewData["Title"] = "Varlıklar";
+}
+
+<!-- Sayfa başlığı ve yeni varlık butonu -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Varlıklar</h1>
+    <a asp-action="Create" class="btn btn-primary">Yeni Varlık</a>
+</div>
+
+<!-- Varlık listesi -->
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Varlık Adı</th>
+                    <th>Kategori</th>
+                    <th>Marka / Model</th>
+                    <th>Seri No</th>
+                    <th>Durum</th>
+                    <th>Alım Tarihi</th>
+                    <th class="text-end">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @* Hiç varlık yoksa bilgi satırı göster *@
+                @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">Henüz varlık eklenmemiş.</td>
+                    </tr>
+                }
+
+                @* Her varlık için bir satır; durum Türkçe ve renkli rozetle gösterilir *@
+                @foreach (var asset in Model)
+                {
+                    <tr>
+                        <td class="fw-semibold">@asset.AssetName</td>
+                        <td>@asset.Category.CategoryName</td>
+                        <td>@asset.Brand @asset.Model</td>
+                        <td><code>@asset.SerialNo</code></td>
+                        <td>
+                            <span class="badge @StatusHelper.GetBadgeClass(asset.Status)">@StatusHelper.GetDisplayName(asset.Status)</span>
+                        </td>
+                        <td>@asset.PurchaseDate?.ToString("dd.MM.yyyy")</td>
+                        <td class="text-end text-nowrap">
+                            <a asp-action="Edit" asp-route-id="@asset.AssetId" class="btn btn-sm btn-outline-primary">Düzenle</a>
+                            <a asp-action="Delete" asp-route-id="@asset.AssetId" class="btn btn-sm btn-outline-danger">Sil</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

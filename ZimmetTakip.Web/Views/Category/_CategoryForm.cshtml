@@ -1,0 +1,17 @@
+@model CategoryFormViewModel
+
+@* Kategori formunun alanları: Create ve Edit sayfaları bu parçayı ortak kullanır *@
+
+<!-- Kategori adı -->
+<div class="mb-3">
+    <label asp-for="CategoryName" class="form-label"></label>
+    <input asp-for="CategoryName" class="form-control" />
+    <span asp-validation-for="CategoryName" class="text-danger small"></span>
+</div>
+
+<!-- Açıklama (isteğe bağlı) -->
+<div class="mb-3">
+    <label asp-for="Description" class="form-label"></label>
+    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+    <span asp-validation-for="Description" class="text-danger small"></span>
+</div>
