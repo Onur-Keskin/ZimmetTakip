@@ -27,6 +27,12 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Login(string? returnUrl = null)
     {
+        // Zaten giriş yapmış kullanıcının tekrar giriş formunu görmesine gerek yok; ana sayfaya gönder
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
         ViewData["ReturnUrl"] = returnUrl;
         return View();
     }
@@ -96,6 +102,12 @@ public class AccountController : Controller
     [HttpGet]
     public IActionResult Register()
     {
+        // Zaten giriş yapmış kullanıcının yeni hesap açmasına gerek yok; ana sayfaya gönder
+        if (User.Identity?.IsAuthenticated == true)
+        {
+            return RedirectToAction("Index", "Home");
+        }
+
         return View();
     }
 
