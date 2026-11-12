@@ -1,7 +1,85 @@
-﻿@{
+﻿@model HomeIndexViewModel
+@{
     ViewData["Title"] = "Ana Sayfa";
 }
 
-<!-- Geçici karşılama içeriği: modüller eklendikçe değiştirilecek -->
-<h1 class="h3 mb-3">Zimmet Takip Sistemi</h1>
-<p class="text-muted">BT envanter ve zimmet takip paneline hoş geldiniz.</p>
+<!-- Karşılama başlığı: giriş yapan kullanıcının adı cookie'deki Name claim'inden gelir -->
+<h1 class="h3 mb-1">Hoş geldiniz, @User.Identity?.Name</h1>
+<p class="text-muted mb-4">BT envanter ve zimmet takip paneli</p>
+
+@if (Model.IsAdmin)
+{
+    @* Admin özet kartları: her kart ilgili listeye bağlantıdır (stretched-link ile kartın tamamı tıklanabilir).
+       Durum adları ve renkleri StatusHelper'dan alınır, listelerdeki rozetlerle aynı görünür. *@
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-5 g-3">
+        <!-- Toplam varlık -->
+        <div class="col">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Toplam Varlık</div>
+                    <div class="display-6 fw-semibold">@Model.TotalAssetCount</div>
+                    <a asp-controller="Asset" asp-action="Index" class="stretched-link small">Varlıklar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Depoda olan varlıklar -->
+        <div class="col">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <span class="badge @StatusHelper.GetBadgeClass(StatusHelper.InStock)">@StatusHelper.GetDisplayName(StatusHelper.InStock)</span>
+                    <div class="display-6 fw-semibold">@Model.InStockCount</div>
+                    <a asp-controller="Asset" asp-action="Index" class="stretched-link small">Varlıklar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Zimmetli varlıklar -->
+        <div class="col">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <span class="badge @StatusHelper.GetBadgeClass(StatusHelper.Assigned)">@StatusHelper.GetDisplayName(StatusHelper.Assigned)</span>
+                    <div class="display-6 fw-semibold">@Model.AssignedCount</div>
+                    <a asp-controller="Asset" asp-action="Index" class="stretched-link small">Varlıklar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Arızalı varlıklar -->
+        <div class="col">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <span class="badge @StatusHelper.GetBadgeClass(StatusHelper.Faulty)">@StatusHelper.GetDisplayName(StatusHelper.Faulty)</span>
+                    <div class="display-6 fw-semibold">@Model.FaultyCount</div>
+                    <a asp-controller="Asset" asp-action="Index" class="stretched-link small">Varlıklar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aktif zimmetler (returned_at boş) -->
+        <div class="col">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Aktif Zimmet</div>
+                    <div class="display-6 fw-semibold">@Model.ActiveAssignmentCount</div>
+                    <a asp-controller="Assignment" asp-action="Index" class="stretched-link small">Zimmetler</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    @* User özet kartı: sadece giriş yapan kullanıcının kendi aktif zimmet sayısı *@
+    <div class="row">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <div class="text-muted small">Üzerimdeki Zimmetler</div>
+                    <div class="display-6 fw-semibold">@Model.MyActiveAssignmentCount</div>
+                    <a asp-controller="MyAssignments" asp-action="Index" class="stretched-link small">Zimmetlerim</a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
