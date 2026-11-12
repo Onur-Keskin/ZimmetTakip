@@ -38,6 +38,7 @@ public class HomeController : Controller
             model.InStockCount = await _context.Assets.CountAsync(a => a.Status == StatusHelper.InStock);
             model.AssignedCount = await _context.Assets.CountAsync(a => a.Status == StatusHelper.Assigned);
             model.FaultyCount = await _context.Assets.CountAsync(a => a.Status == StatusHelper.Faulty);
+            model.RetiredCount = await _context.Assets.CountAsync(a => a.Status == StatusHelper.Retired);
             model.ActiveAssignmentCount = await _context.Assignments.CountAsync(a => a.ReturnedAt == null);
         }
         else

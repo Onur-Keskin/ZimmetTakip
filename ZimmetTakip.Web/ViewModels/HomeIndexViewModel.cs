@@ -21,6 +21,9 @@ public class HomeIndexViewModel
     // Durumu "Arızalı" (faulty) olan varlık sayısı
     public int FaultyCount { get; set; }
 
+    // Durumu "Hurda" (retired) olan varlık sayısı
+    public int RetiredCount { get; set; }
+
     // Aktif zimmet sayısı (returned_at boş olan zimmet kayıtları)
     public int ActiveAssignmentCount { get; set; }
 

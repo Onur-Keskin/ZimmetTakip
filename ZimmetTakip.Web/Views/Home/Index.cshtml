@@ -11,7 +11,7 @@
 {
     @* Admin özet kartları: her kart ilgili listeye bağlantıdır (stretched-link ile kartın tamamı tıklanabilir).
        Durum adları ve renkleri StatusHelper'dan alınır, listelerdeki rozetlerle aynı görünür. *@
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-5 g-3">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-6 g-3">
         <!-- Toplam varlık -->
         <div class="col">
             <div class="card shadow-sm h-100">
@@ -51,6 +51,17 @@
                 <div class="card-body">
                     <span class="badge @StatusHelper.GetBadgeClass(StatusHelper.Faulty)">@StatusHelper.GetDisplayName(StatusHelper.Faulty)</span>
                     <div class="display-6 fw-semibold">@Model.FaultyCount</div>
+                    <a asp-controller="Asset" asp-action="Index" class="stretched-link small">Varlıklar</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hurda (kullanım dışı) varlıklar -->
+        <div class="col">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <span class="badge @StatusHelper.GetBadgeClass(StatusHelper.Retired)">@StatusHelper.GetDisplayName(StatusHelper.Retired)</span>
+                    <div class="display-6 fw-semibold">@Model.RetiredCount</div>
                     <a asp-controller="Asset" asp-action="Index" class="stretched-link small">Varlıklar</a>
                 </div>
             </div>
